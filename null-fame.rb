@@ -1,9 +1,10 @@
+require 'json'
 require 'sinatra'
-require 'json'
-require 'json'
+require "sqlite3"
 
 # Sinatra Config
 enable :sessions
+
 
 ###########################
 # Routes
@@ -12,6 +13,16 @@ enable :sessions
 # Root
 #
 get '/' do
+  db = SQLite3::Database.new db_path
+  rows = db.execute <<-SQL
+    SELECT
+      name
+    FROM
+      sqlite_master
+    WHERE
+      type in ('table')
+  SQL
+  puts "ROWS: #{rows}"
   erb :index
 end
 
@@ -28,5 +39,9 @@ end
 
 def track_path(track_name)
   File.join(here, 'music', track_name)
+end
+
+def db_path
+  File.join(here, 'Beets', 'musiclibrary.blb')
 end
 
